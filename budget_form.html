@@ -1,0 +1,32 @@
+{% extends 'tracker/base.html' %}
+{% block title %}Новый лимит{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>Настройка лимита бюджета</h1>
+        <p>Планирование месячного бюджета по выбранной категории расходов.</p>
+    </div>
+</section>
+<div class="form-layout">
+    <div class="panel">
+        <form method="post" class="entity-form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-row">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<small class="field-error">{{ field.errors|join:', ' }}</small>{% endif %}
+                </div>
+            {% endfor %}
+            <div class="form-actions">
+                <button class="btn-primary" type="submit">Сохранить</button>
+                <a class="btn-secondary" href="{% url 'budget-list' %}">Отмена</a>
+            </div>
+        </form>
+    </div>
+    <div class="panel side-panel">
+        <h3>Как это работает</h3>
+        <p>Пользователь задает лимит на месяц для категории расходов, а приложение автоматически сравнивает его с фактическими расходами по операциям.</p>
+    </div>
+</div>
+{% endblock %}

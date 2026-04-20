@@ -1,0 +1,42 @@
+{% extends 'tracker/base.html' %}
+{% load tracker_extras %}
+{% block title %}Операции{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>Журнал операций</h1>
+        <p>Просмотр всех доходов и расходов в единой таблице.</p>
+    </div>
+    <a class="btn-primary" href="{% url 'transaction-add' %}">+ Добавить операцию</a>
+</section>
+<div class="panel">
+    <table>
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Тип</th>
+                <th>Операция</th>
+                <th>Категория</th>
+                <th>Комментарий</th>
+                <th>Сумма</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in transactions %}
+            <tr>
+                <td>{{ item.transaction_date|date:'d.m.Y' }}</td>
+                <td>{{ item.get_transaction_type_display }}</td>
+                <td>{{ item.title }}</td>
+                <td>{{ item.category.name }}</td>
+                <td>{{ item.comment|default:'-' }}</td>
+                <td class="{% if item.transaction_type == 'income' %}positive{% else %}negative{% endif %}">
+                    {% if item.transaction_type == 'income' %}+{% else %}-{% endif %}{{ item.amount|money }} ₽
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">Пока нет операций.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

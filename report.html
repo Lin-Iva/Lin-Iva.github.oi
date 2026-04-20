@@ -1,0 +1,66 @@
+{% extends 'tracker/base.html' %}
+{% load tracker_extras %}
+{% block title %}Отчеты{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>Отчеты по категориям</h1>
+        <p>Аналитика доходов и расходов по выбранному диапазону дат.</p>
+    </div>
+</section>
+<div class="panel filter-panel">
+    <form method="get" class="filters">
+        <div>
+            <label>Дата с</label>
+            <input type="date" name="start_date" value="{{ start_date }}">
+        </div>
+        <div>
+            <label>Дата по</label>
+            <input type="date" name="end_date" value="{{ end_date }}">
+        </div>
+        <button class="btn-primary" type="submit">Сформировать</button>
+    </form>
+</div>
+<section class="two-column">
+    <div class="panel">
+        <h3>Доходы по категориям</h3>
+        <table>
+            <thead><tr><th>Категория</th><th>Сумма</th></tr></thead>
+            <tbody>
+                {% for row in income_by_category %}
+                <tr><td>{{ row.category__name }}</td><td class="positive">{{ row.total|money }} ₽</td></tr>
+                {% empty %}
+                <tr><td colspan="2">Нет данных</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel">
+        <h3>Расходы по категориям</h3>
+        <table>
+            <thead><tr><th>Категория</th><th>Сумма</th></tr></thead>
+            <tbody>
+                {% for row in expense_by_category %}
+                <tr><td>{{ row.category__name }}</td><td class="negative">{{ row.total|money }} ₽</td></tr>
+                {% empty %}
+                <tr><td colspan="2">Нет данных</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+<section class="two-column lower-grid">
+    <div class="panel">
+        <h3>Структура расходов</h3>
+        {% if expense_chart %}
+            <img class="chart-image" src="data:image/png;base64,{{ expense_chart }}" alt="Структура расходов">
+        {% endif %}
+    </div>
+    <div class="panel">
+        <h3>Сравнение доходов и расходов</h3>
+        {% if balance_chart %}
+            <img class="chart-image" src="data:image/png;base64,{{ balance_chart }}" alt="Сравнение доходов и расходов">
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'tracker/base.html' %}
+{% load tracker_extras %}
+{% block title %}Финансовая панель{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>Финансовая панель</h1>
+        <p>Единый экран для контроля баланса, последних операций и бюджета.</p>
+    </div>
+    <a class="btn-primary" href="{% url 'transaction-add' %}">+ Добавить операцию</a>
+</section>
+
+<section class="cards-grid">
+    <article class="metric-card">
+        <span>Текущий баланс</span>
+        <h2>{{ balance|money }} ₽</h2>
+        <p class="muted">Доходы - расходы</p>
+    </article>
+    <article class="metric-card">
+        <span>Доходы</span>
+        <h2>{{ total_income|money }} ₽</h2>
+        <p class="muted">Всего внесено</p>
+    </article>
+    <article class="metric-card">
+        <span>Расходы</span>
+        <h2>{{ total_expense|money }} ₽</h2>
+        <p class="muted">Всего списано</p>
+    </article>
+</section>
+
+<section class="two-column">
+    <div class="panel">
+        <h3>Последние операции</h3>
+        <table>
+            <thead>
+                <tr><th>Дата</th><th>Операция</th><th>Категория</th><th>Сумма</th></tr>
+            </thead>
+            <tbody>
+                {% for item in latest_transactions %}
+                <tr>
+                    <td>{{ item.transaction_date|date:'d.m.Y' }}</td>
+                    <td>{{ item.title }}</td>
+                    <td>{{ item.category.name }}</td>
+                    <td class="{% if item.transaction_type == 'income' %}positive{% else %}negative{% endif %}">
+                        {% if item.transaction_type == 'income' %}+{% else %}-{% endif %}{{ item.amount|money }} ₽
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">Операции еще не добавлены.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel">
+        <h3>Топ расходов</h3>
+        <ul class="category-list">
+            {% for row in expense_breakdown %}
+                <li><span>{{ row.category__name }}</span><strong>{{ row.total|money }} ₽</strong></li>
+            {% empty %}
+                <li><span>Нет данных</span><strong>-</strong></li>
+            {% endfor %}
+        </ul>
+        {% if expense_chart %}
+            <img class="chart-image" src="data:image/png;base64,{{ expense_chart }}" alt="Структура расходов">
+        {% endif %}
+    </div>
+</section>
+
+<section class="two-column lower-grid">
+    <div class="panel">
+        <h3>Сравнение доходов и расходов</h3>
+        {% if balance_chart %}
+            <img class="chart-image" src="data:image/png;base64,{{ balance_chart }}" alt="Доходы и расходы">
+        {% endif %}
+    </div>
+    <div class="panel">
+        <h3>Контроль бюджета</h3>
+        {% if budgets %}
+            {% for budget in budgets %}
+                <div class="budget-item">
+                    <div class="budget-top">
+                        <span>{{ budget.category.name }}</span>
+                        <strong>{{ budget.spent_amount|money }} / {{ budget.limit_amount|money }} ₽</strong>
+                    </div>
+                    <div class="progress-line"><span style="width: {{ budget.usage_percent|bounded_percent }}%"></span></div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% if budget_chart %}
+            <img class="chart-image" src="data:image/png;base64,{{ budget_chart }}" alt="Контроль бюджета">
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

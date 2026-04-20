@@ -1,0 +1,41 @@
+{% extends 'tracker/base.html' %}
+{% load tracker_extras %}
+{% block title %}Бюджет{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>Лимиты бюджета</h1>
+        <p>Контроль месячных лимитов по категориям расходов.</p>
+    </div>
+    <a class="btn-primary" href="{% url 'budget-add' %}">+ Новый лимит</a>
+</section>
+<div class="panel">
+    <table>
+        <thead>
+            <tr>
+                <th>Категория</th>
+                <th>Месяц</th>
+                <th>Лимит</th>
+                <th>Фактические расходы</th>
+                <th>Использование</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for budget in budgets %}
+            <tr>
+                <td>{{ budget.category.name }}</td>
+                <td>{{ budget.month|date:'m.Y' }}</td>
+                <td>{{ budget.limit_amount|money }} ₽</td>
+                <td>{{ budget.spent_amount|money }} ₽</td>
+                <td>
+                    <div class="progress-line compact"><span style="width: {{ budget.usage_percent|bounded_percent }}%"></span></div>
+                    <small>{{ budget.usage_percent }}%</small>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">Лимиты еще не заданы.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

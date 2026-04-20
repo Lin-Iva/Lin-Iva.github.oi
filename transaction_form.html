@@ -1,0 +1,38 @@
+{% extends 'tracker/base.html' %}
+{% block title %}Добавить операцию{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>Новая операция</h1>
+        <p>Форма позволяет добавить доход или расход с привязкой к категории.</p>
+    </div>
+</section>
+<div class="form-layout">
+    <div class="panel">
+        <form method="post" class="entity-form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-row">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<small class="field-error">{{ field.errors|join:', ' }}</small>{% endif %}
+                </div>
+            {% endfor %}
+            <div class="form-actions">
+                <button class="btn-primary" type="submit">Сохранить</button>
+                <a class="btn-secondary" href="{% url 'transaction-list' %}">Отмена</a>
+            </div>
+        </form>
+    </div>
+    <div class="panel side-panel">
+        <h3>Правила ввода</h3>
+        <ol>
+            <li>Выберите тип операции: доход или расход.</li>
+            <li>Укажите категорию такого же типа.</li>
+            <li>Введите сумму и дату.</li>
+            <li>При необходимости оставьте комментарий.</li>
+        </ol>
+        <p class="muted">Проверки формы предотвращают ошибочное использование категории другого типа.</p>
+    </div>
+</div>
+{% endblock %}
